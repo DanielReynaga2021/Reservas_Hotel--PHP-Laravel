@@ -16,7 +16,7 @@ return new class extends Migration
             $table->string('name',255);
             $table->string('address', 255);
             $table->integer('number_hotel');
-            $table->float('rating', 1,1);
+            $table->float('rating', 3,1);
             $table->timestamps();
         });
 
