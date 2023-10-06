@@ -19,8 +19,8 @@ return new class extends Migration
 
         Schema::create('locations', function (Blueprint $table) {
             $table->id();
-            $table->string('location',255);
-            $table->integer('geoId');
+            $table->string('name',255);
+            $table->integer('geo_id');
             $table->unsignedBigInteger('country_id');
             $table->foreign('country_id')->references('id')->on('countrys');
             $table->timestamps();

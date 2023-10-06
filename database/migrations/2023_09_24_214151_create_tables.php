@@ -14,9 +14,11 @@ return new class extends Migration
         Schema::create('hotels', function (Blueprint $table) {
             $table->id();
             $table->string('name',255);
-            $table->string('address', 255);
+            $table->string('address',255)->nullable();
+            $table->float('rating', 3,1)->nullable();
             $table->integer('number_hotel');
-            $table->float('rating', 3,1);
+            $table->unsignedBigInteger('location_id');
+            $table->foreign('location_id')->references('id')->on('locations');
             $table->timestamps();
         });
 
@@ -63,8 +65,8 @@ return new class extends Migration
     {
         Schema::dropIfExists('payments');
         Schema::dropIfExists('payment_status');
-        Schema::dropIfExists('room_types');
         Schema::dropIfExists('reservations');
+        Schema::dropIfExists('room_types');
         Schema::dropIfExists('hotels');
     }
 };
