@@ -25,7 +25,7 @@ use Illuminate\Database\Eloquent\Model;
  */
 class Payment extends Model
 {
-	protected $table = 'payment';
+	protected $table = 'payments';
 
 	protected $casts = [
 		'reservation_id' => 'int',

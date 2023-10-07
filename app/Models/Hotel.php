@@ -15,12 +15,14 @@ use Illuminate\Database\Eloquent\Model;
  * 
  * @property int $id
  * @property string $name
- * @property string $address
+ * @property string|null $address
+ * @property float|null $rating
  * @property int $number_hotel
- * @property float $rating
+ * @property int $location_id
  * @property Carbon|null $created_at
  * @property Carbon|null $updated_at
  * 
+ * @property Location $location
  * @property Collection|RoomType[] $room_types
  *
  * @package App\Models
@@ -30,16 +32,23 @@ class Hotel extends Model
 	protected $table = 'hotels';
 
 	protected $casts = [
+		'rating' => 'float',
 		'number_hotel' => 'int',
-		'rating' => 'float'
+		'location_id' => 'int'
 	];
 
 	protected $fillable = [
 		'name',
 		'address',
+		'rating',
 		'number_hotel',
-		'rating'
+		'location_id'
 	];
+
+	public function location()
+	{
+		return $this->belongsTo(Location::class);
+	}
 
 	public function room_types()
 	{

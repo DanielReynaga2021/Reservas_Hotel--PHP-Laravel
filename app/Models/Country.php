@@ -11,27 +11,27 @@ use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
 
 /**
- * Class PaymentStatus
+ * Class Country
  * 
  * @property int $id
  * @property string $name
  * @property Carbon|null $created_at
  * @property Carbon|null $updated_at
  * 
- * @property Collection|Payment[] $payments
+ * @property Collection|Location[] $locations
  *
  * @package App\Models
  */
-class PaymentStatus extends Model
+class Country extends Model
 {
-	protected $table = 'payment_status';
+	protected $table = 'countrys';
 
 	protected $fillable = [
 		'name'
 	];
 
-	public function payments()
+	public function locations()
 	{
-		return $this->hasMany(Payment::class);
+		return $this->hasMany(Location::class);
 	}
 }
