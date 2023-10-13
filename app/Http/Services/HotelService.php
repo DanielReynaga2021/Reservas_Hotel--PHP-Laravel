@@ -7,11 +7,9 @@ use App\Helpers\StringHelper;
 use App\Http\Requests\HotelRequest;
 use App\Http\WebServices\GeoIdWebService;
 use App\Http\WebServices\SearchHotelsWebService;
-use App\Models\Address;
 use App\Models\Country;
 use App\Models\Hotel;
 use App\Models\Location;
-use App\Models\Rating;
 use App\Repositories\HotelRepository;
 use App\Repositories\LocationRepository;
 use Carbon\Carbon;
@@ -43,13 +41,13 @@ class HotelService
         
         $hotels = $this->hotelRepository->getHotelsByLocation($locationNormalized, $countryNormalized);
         if (!$hotels->isEmpty()){
-            return ResponseHelper::Response(true, 'hoteles', $hotels);
+            $hotelsArray = ['hotels' => $hotels];
+            return ResponseHelper::Response(true, 'hoteles', $hotelsArray);
         }
 
         $geoId = $this->locationRepository->getGeoId($hotelRequest->location, $hotelRequest->country);
         if (empty($geoId)) {
             $responseGeoId = $this->geoIdWebService->getGeoId($hotelRequest->location, $hotelRequest->country);
-            //echo "<pre>";print_r($responseGeoId->object()->data);echo "<br>"; exit;
             $this->validateWebService($responseGeoId);
             $country = Country::Where("name", $countryNormalized)->first();
             if (empty($country)) {
@@ -96,9 +94,9 @@ class HotelService
                 unset($hotel["number_hotel"]);
                 array_push($hotels, $hotel);
         }
-        return ResponseHelper::Response(true, 'hoteles', $hotels);
+        $hotelsArray = ['hotels' => $hotels];
+        return ResponseHelper::Response(true, 'hoteles', $hotelsArray);
     }
-
     public function validateWebService($response)
     {
         if ($response->failed()) {

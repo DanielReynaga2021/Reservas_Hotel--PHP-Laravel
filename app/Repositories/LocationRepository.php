@@ -5,7 +5,6 @@ use App\Models\Location;
 
 class LocationRepository{
     public function getGeoId(string $location, string $country){
-        //buscar en la base de datos... el geoID
         $geoId = Location::select('locations.geo_id')
             ->join('countrys', 'locations.country_id', '=', 'countrys.id')
             ->where('locations.name', '=', $location)
