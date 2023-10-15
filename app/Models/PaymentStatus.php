@@ -18,7 +18,7 @@ use Illuminate\Database\Eloquent\Model;
  * @property Carbon|null $created_at
  * @property Carbon|null $updated_at
  * 
- * @property Collection|Payment[] $payments
+ * @property Collection|Reservation[] $reservations
  *
  * @package App\Models
  */
@@ -30,8 +30,8 @@ class PaymentStatus extends Model
 		'name'
 	];
 
-	public function payments()
+	public function reservations()
 	{
-		return $this->hasMany(Payment::class);
+		return $this->hasMany(Reservation::class);
 	}
 }
