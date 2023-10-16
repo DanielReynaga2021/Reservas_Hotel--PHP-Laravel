@@ -2,8 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\RoomRequest;
 use App\Http\Services\RoomService;
-use Illuminate\Http\Request;
 
 class RoomController extends Controller
 {
@@ -15,7 +15,7 @@ class RoomController extends Controller
     {
         $this->roomService = $roomService;
     }
-    public function searchRoomsByHotel(Request $request){
+    public function searchRoomsByHotel(RoomRequest $request){
         return $this->roomService->searchRoomsByHotel($request);
     }
 }

@@ -23,5 +23,5 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 
 Route::post('register', [AuthController::class, 'registerUser']);
 Route::post('login', [AuthController::class, 'loginUser']);
-Route::post('searchHotels', [HotelController::class, 'searchHotels']);
-Route::post('searchRoomsByHotel', [RoomController::class, 'searchRoomsByHotel']);
+Route::post('hotels', [HotelController::class, 'searchHotels']);
+Route::post('rooms', [RoomController::class, 'searchRoomsByHotel']);

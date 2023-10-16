@@ -12,7 +12,6 @@ use App\Models\Hotel;
 use App\Models\Location;
 use App\Repositories\HotelRepository;
 use App\Repositories\LocationRepository;
-use Carbon\Carbon;
 use Illuminate\Http\Exceptions\HttpResponseException;
 use Symfony\Component\HttpFoundation\Response;
 
@@ -42,7 +41,7 @@ class HotelService
         $hotels = $this->hotelRepository->getHotelsByLocation($locationNormalized, $countryNormalized);
         if (!$hotels->isEmpty()){
             $hotelsArray = ['hotels' => $hotels];
-            return ResponseHelper::Response(true, 'hoteles', $hotelsArray);
+            return ResponseHelper::Response(true, 'select a hotel', $hotelsArray);
         }
 
         $geoId = $this->locationRepository->getGeoId($hotelRequest->location, $hotelRequest->country);
@@ -70,8 +69,8 @@ class HotelService
             }
         }
         $this->validateGeoId($geoId);
-        $checkIn = Carbon::createFromFormat('d-m-Y', $hotelRequest->checkIn)->format('Y-m-d');
-        $checkOut = Carbon::createFromFormat('d-m-Y', $hotelRequest->checkOut)->format('Y-m-d');
+        $checkIn = date("Y-m-d");
+        $checkOut = date("Y-m-d", strtotime($checkIn . " +50 days"));
 
         $responseHotels = $this->searchHotelsWebService->getHotels($geoId, $checkIn, $checkOut);
         $this->validateWebService($responseHotels);
@@ -95,7 +94,7 @@ class HotelService
                 array_push($hotels, $hotel);
         }
         $hotelsArray = ['hotels' => $hotels];
-        return ResponseHelper::Response(true, 'hoteles', $hotelsArray);
+        return ResponseHelper::Response(true, 'select a hotel', $hotelsArray);
     }
     public function validateWebService($response)
     {
@@ -111,7 +110,7 @@ class HotelService
             throw new HttpResponseException(
                 response()->json([
                     'success' => false,
-                    'message' => "no se encontro hoteles para la localizacion"], Response::HTTP_NOT_ACCEPTABLE)
+                    'message' => "no hotels found for the location"], Response::HTTP_NOT_ACCEPTABLE)
             );
         }
     }
@@ -122,7 +121,7 @@ class HotelService
             throw new HttpResponseException(
                 response()->json([
                     'success' => false,
-                    'message' => "no se encontro el geoId para la localizacion"], Response::HTTP_NOT_ACCEPTABLE)
+                    'message' => "geoId not found for location"], Response::HTTP_NOT_ACCEPTABLE)
             );
         }
     }
