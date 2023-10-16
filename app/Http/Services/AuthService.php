@@ -1,6 +1,7 @@
 <?php
 
 namespace App\Http\Services;
+use App\Helpers\ResponseHelper;
 use App\Http\Requests\AuthRequest;
 use App\Models\User;
 use Illuminate\Support\Facades\Auth;
@@ -15,9 +16,7 @@ class AuthService{
         $user->password = $authRequest->password;
         $user->save();
 
-        return response()->json([
-            'success'=> true,
-        ]);
+        return ResponseHelper::Response(true, 'successfully registered');
     }
 
     public function loginUser(Array $credentials){
@@ -31,10 +30,6 @@ class AuthService{
         $user = User::Where("email", $credentials["email"])->first();
         $token = $user->createToken("auth_token")->plainTextToken;
         
-        return response()->json([
-            'success'=> true,
-            'message'=> "ok",
-            'token'=> $token,
-        ], JsonResponse::HTTP_ACCEPTED);
+        return ResponseHelper::Response(true, 'started session with success', 'token', $token);
     }
 }
