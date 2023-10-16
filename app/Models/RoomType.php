@@ -15,6 +15,7 @@ use Illuminate\Database\Eloquent\Model;
  * 
  * @property int $id
  * @property string $name
+ * @property int $rooms_available
  * @property int $hotel_id
  * @property Carbon|null $created_at
  * @property Carbon|null $updated_at
@@ -29,11 +30,13 @@ class RoomType extends Model
 	protected $table = 'room_types';
 
 	protected $casts = [
+		'rooms_available' => 'int',
 		'hotel_id' => 'int'
 	];
 
 	protected $fillable = [
 		'name',
+		'rooms_available',
 		'hotel_id'
 	];
 

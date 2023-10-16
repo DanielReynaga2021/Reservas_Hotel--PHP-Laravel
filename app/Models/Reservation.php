@@ -17,12 +17,13 @@ use Illuminate\Database\Eloquent\Model;
  * @property Carbon $date_until
  * @property int $user_id
  * @property int $room_type_id
+ * @property int $payment_status_id
  * @property Carbon|null $created_at
  * @property Carbon|null $updated_at
  * 
+ * @property PaymentStatus $payment_status
  * @property RoomType $room_type
  * @property User $user
- * @property Payment $payment
  *
  * @package App\Models
  */
@@ -34,15 +35,22 @@ class Reservation extends Model
 		'date_from' => 'datetime',
 		'date_until' => 'datetime',
 		'user_id' => 'int',
-		'room_type_id' => 'int'
+		'room_type_id' => 'int',
+		'payment_status_id' => 'int'
 	];
 
 	protected $fillable = [
 		'date_from',
 		'date_until',
 		'user_id',
-		'room_type_id'
+		'room_type_id',
+		'payment_status_id'
 	];
+
+	public function payment_status()
+	{
+		return $this->belongsTo(PaymentStatus::class);
+	}
 
 	public function room_type()
 	{
@@ -52,10 +60,5 @@ class Reservation extends Model
 	public function user()
 	{
 		return $this->belongsTo(User::class);
-	}
-
-	public function payment()
-	{
-		return $this->hasOne(Payment::class);
 	}
 }
