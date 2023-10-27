@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\HotelController;
+use App\Http\Controllers\ReservationController;
 use App\Http\Controllers\RoomController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
@@ -21,7 +22,13 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();
 });
 
+
+Route::middleware('auth:sanctum')->group(function () {
+    Route::post('hotels', [HotelController::class, 'searchHotels']);
+    Route::post('reservation', [ReservationController::class, 'createReservation']);
+    Route::post('rooms', [RoomController::class, 'searchRoomsByHotel']);
+    Route::post('logout', [AuthController::class, 'logoutUser']);
+});
+
 Route::post('register', [AuthController::class, 'registerUser']);
 Route::post('login', [AuthController::class, 'loginUser']);
-Route::post('hotels', [HotelController::class, 'searchHotels']);
-Route::post('rooms', [RoomController::class, 'searchRoomsByHotel']);

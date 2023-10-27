@@ -30,6 +30,11 @@ class AuthService{
         $user = User::Where("email", $credentials["email"])->first();
         $token = $user->createToken("auth_token")->plainTextToken;
         
-        return ResponseHelper::Response(true, 'started session with success', 'token', $token);
+        return ResponseHelper::Response(true, 'started session with success', $token, 'token');
+    }
+
+    public function logoutUser(){
+        auth()->user()->tokens()->delete();
+        return ResponseHelper::Response(true, 'logged out successfully');
     }
 }

@@ -13,6 +13,7 @@ use Illuminate\Database\Eloquent\Model;
  * Class Reservation
  * 
  * @property int $id
+ * @property string $code
  * @property Carbon $date_from
  * @property Carbon $date_until
  * @property int $user_id
@@ -40,6 +41,7 @@ class Reservation extends Model
 	];
 
 	protected $fillable = [
+		'code',
 		'date_from',
 		'date_until',
 		'user_id',

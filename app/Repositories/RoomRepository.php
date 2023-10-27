@@ -12,4 +12,11 @@ class RoomRepository{
 
         return $rooms;
     }
+
+    public function getroomsAvailable(string $hotel, string $room){
+        return RoomType::join('hotels', 'hotels.id', '=', 'room_types.hotel_id')
+        ->where('hotels.name', $hotel)
+        ->where('room_types.name', $room)
+        ->value('room_types.rooms_available');
+    }
 }

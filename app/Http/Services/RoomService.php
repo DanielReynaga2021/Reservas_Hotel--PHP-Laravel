@@ -42,6 +42,7 @@ class RoomService{
                     foreach($value->content as $valueRoom){
                         $room = new RoomType();
                         $room->name = $valueRoom;
+                        $room->rooms_available = rand(1,10);
                         $room->hotel_id = $hotel->id;
                         $room->save();
                         array_push($rooms, $room->name);
@@ -58,7 +59,7 @@ class RoomService{
             throw new HttpResponseException(
                 response()->json([
                     'success' => false,
-                    'message' => "no se encontro el hotel"], Response::HTTP_NOT_ACCEPTABLE)
+                    'message' => "the hotel was not found"], Response::HTTP_NOT_ACCEPTABLE)
             );
         }
     }
@@ -77,7 +78,7 @@ class RoomService{
             throw new HttpResponseException(
                 response()->json([
                     'success' => false,
-                    'message' => "no se encontro habitaciones"], Response::HTTP_NOT_ACCEPTABLE)
+                    'message' => "no rooms were found"], Response::HTTP_NOT_ACCEPTABLE)
             );
         }
     }

@@ -39,6 +39,7 @@ return new class extends Migration
 
         Schema::create('reservations', function (Blueprint $table) {
             $table->id();
+            $table->string('code', 8)->unique();
             $table->date('date_from');
             $table->date('date_until');
             $table->unsignedBigInteger('user_id');

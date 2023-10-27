@@ -13,4 +13,13 @@ class HotelRepository{
             ->get();
         return $hotels;
     }
+
+    public function getHotelAndRoom(string $hotel, string $room){
+            $hotelAndRoom = Hotel::select('hotels.id as hotelId', 'room_types.id as roomTypesId')
+            ->join('room_types','hotels.id','=','room_types.hotel_id')
+            ->where('hotels.name', $hotel)
+            ->where('room_types.name', $room)
+            ->first();
+        return $hotelAndRoom;
+    }
 }
