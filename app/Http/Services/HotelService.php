@@ -82,7 +82,6 @@ class HotelService
                 $hotel = new Hotel();
                 $hotel->name = $hotelNormalized;
                 $hotel->rating = $value->bubbleRating->rating;
-                $hotel->address = $value->secondaryInfo;
                 $hotel->number_hotel = $value->id;
                 $hotel->location_id = $locationId;
                 $hotel->save();

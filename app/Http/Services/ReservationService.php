@@ -4,7 +4,9 @@ namespace App\Http\Services;
 use App\Enums\PaymentStatusEnum;
 use App\Helpers\ResponseHelper;
 use App\Http\Requests\ReservationRequest;
+use App\Models\Address;
 use App\Models\Reservation;
+use App\Repositories\AddressRepositoty;
 use App\Repositories\HotelRepository;
 use App\Repositories\ReservationRepository;
 use App\Repositories\RoomRepository;
@@ -18,16 +20,19 @@ class ReservationService{
     private ReservationRepository $reservationRepository;
     private HotelRepository $hotelRepository;
     private RoomRepository $roomRepository;
+    private AddressRepositoty $addressRepositoty;
 
     public function __construct(
         ReservationRepository $reservationRepository,
         HotelRepository $hotelRepository,
         RoomRepository $roomRepository,
+        AddressRepositoty $addressRepositoty,
     )
     {
         $this->reservationRepository = $reservationRepository;
         $this->hotelRepository = $hotelRepository;
         $this->roomRepository = $roomRepository;
+        $this->addressRepositoty = $addressRepositoty;
     }
     public function createReservation(ReservationRequest $request){
         
@@ -50,7 +55,12 @@ class ReservationService{
         $reservation->payment_status_id = PaymentStatusEnum::PENDING;
         $reservation->save();
 
-        $response = $this->buildResponse($reservation->code, $request);
+        //$address = $this->addressRepositoty->getAddressByHotel($hotelAndRoom->hotelId);
+        $address = Address::Where("hotel_id", $hotelAndRoom->hotelId)->first();
+        $address = $address->name;
+        $this->validateAddress($address);
+        
+        $response = $this->buildResponse($reservation->code, $request, $address);
         return ResponseHelper::Response(true, 'successfully reservation', $response);
     }
 
@@ -60,6 +70,16 @@ class ReservationService{
                 response()->json([
                     'success' => false,
                     'message' => "the hotel/room was not found"], Response::HTTP_NOT_ACCEPTABLE)
+            );
+        }
+    }
+
+    public function validateAddress($address){
+        if (empty($address)) {
+            throw new HttpResponseException(
+                response()->json([
+                    'success' => false,
+                    'message' => "the address was not found"], Response::HTTP_NOT_ACCEPTABLE)
             );
         }
     }
@@ -74,11 +94,12 @@ class ReservationService{
         }
     }
 
-    public function buildResponse(string $reservationCode, ReservationRequest $request){
+    public function buildResponse(string $reservationCode, ReservationRequest $request, string $address){
         $response = [ 'reservationCode' => $reservationCode,
                       'details'=>[
                       'hotel' => $request->hotel,
                       'room' => $request->room,
+                      'address' => $address,
                       'dateFrom'=> $request->dateFrom,
                       'dateUntil' => $request->dateUntil,
                       'paymentStatus' => PaymentStatusEnum::getPaymentStatus(1),]

@@ -50,6 +50,11 @@ class Hotel extends Model
 		return $this->belongsTo(Location::class);
 	}
 
+	public function address()
+	{
+		return $this->hasOne(Address::class);
+	}
+
 	public function room_types()
 	{
 		return $this->hasMany(RoomType::class);

@@ -4,6 +4,7 @@ namespace App\Http\Services;
 use App\Helpers\ResponseHelper;
 use App\Http\Requests\RoomRequest;
 use App\Http\WebServices\SearchHotelsWebService;
+use App\Models\Address;
 use App\Models\Hotel;
 use App\Models\RoomType;
 use App\Repositories\RoomRepository;
@@ -36,8 +37,14 @@ class RoomService{
             $response = $this->searchHotelsWebService->getRooms($hotel->number_hotel, $checkIn, $checkOut);
             $rooms = [];
             $this->validateWebService($response);
-            $responseData = $response->object()->data->amenitiesScreen;
-            foreach($responseData as $value){
+            $responseData = $response->object()->data;
+            $amenitiesScreenData = $responseData->amenitiesScreen;
+            $addressData = $responseData->location->address;
+            $address = new Address();
+            $address->name = $addressData;
+            $address->hotel_id = $hotel->id;
+            $address->save();
+            foreach($amenitiesScreenData as $value){
                 if($value->title === 'Room types'){
                     foreach($value->content as $valueRoom){
                         $room = new RoomType();
