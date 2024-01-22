@@ -2,7 +2,10 @@
 
 namespace App\Exceptions;
 
+use App\Helpers\ResponseHelper;
+use Illuminate\Database\QueryException;
 use Illuminate\Foundation\Exceptions\Handler as ExceptionHandler;
+use Illuminate\Http\Response;
 use Throwable;
 
 class Handler extends ExceptionHandler
@@ -26,5 +29,14 @@ class Handler extends ExceptionHandler
         $this->reportable(function (Throwable $e) {
             //
         });
+    }
+
+    public function render($request, Throwable $exception)
+    {
+    if ($exception instanceof QueryException) {
+        return ResponseHelper::Response(false, $exception->getMessage(), Response::HTTP_INTERNAL_SERVER_ERROR, 'DB_NOT_FOUND', 'code');
+    }
+
+    return parent::render($request, $exception);
     }
 }
