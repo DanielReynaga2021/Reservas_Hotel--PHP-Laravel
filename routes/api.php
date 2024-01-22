@@ -1,6 +1,6 @@
 <?php
 
-use App\Http\Controllers\AuthController;
+use App\Http\Controllers\UserController;
 use App\Http\Controllers\HotelController;
 use App\Http\Controllers\ReservationController;
 use App\Http\Controllers\RoomController;
@@ -27,8 +27,8 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('hotels', [HotelController::class, 'searchHotels']);
     Route::post('reservation', [ReservationController::class, 'createReservation']);
     Route::post('rooms', [RoomController::class, 'searchRoomsByHotel']);
-    Route::post('logout', [AuthController::class, 'logoutUser']);
+    Route::post('logout', [UserController::class, 'logoutUser']);
 });
 
-Route::post('register', [AuthController::class, 'registerUser']);
-Route::post('login', [AuthController::class, 'loginUser']);
+Route::post('register', [UserController::class, 'registerUser']);
+Route::post('login', [UserController::class, 'loginUser']);
