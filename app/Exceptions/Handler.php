@@ -33,8 +33,8 @@ class Handler extends ExceptionHandler
 
     public function render($request, Throwable $exception)
     {
-    if ($exception instanceof QueryException) {
-        return ResponseHelper::Response(false, $exception->getMessage(), Response::HTTP_INTERNAL_SERVER_ERROR, 'DB_NOT_FOUND', 'code');
+    if ($exception instanceof QueryException && !config('app.debug')) {
+        return ResponseHelper::Response(false, $exception->getPrevious()->getMessage(), Response::HTTP_INTERNAL_SERVER_ERROR, 'DB_NOT_FOUND', 'code');
     }
 
     return parent::render($request, $exception);
