@@ -1,33 +1,28 @@
 <?php
 
 namespace App\Http\Services;
+
 use App\Helpers\ResponseHelper;
 use App\Http\Requests\RoomRequest;
 use App\Http\WebServices\SearchHotelsWebService;
-use App\Models\Address;
-use App\Models\Hotel;
 use App\Models\RoomType;
 use App\Repositories\RoomRepository;
+use Exception;
 use Illuminate\Http\Exceptions\HttpResponseException;
 use Symfony\Component\HttpFoundation\Response;
+use Illuminate\Support\Facades\DB;
 
 class RoomService{
 
-    private RoomRepository $roomRepository;
-    private SearchHotelsWebService $searchHotelsWebService;
-
     public function __construct(
-        RoomRepository $roomRepository,
-        SearchHotelsWebService $searchHotelsWebService,
-    )
-    {
-        $this->roomRepository = $roomRepository;
-        $this->searchHotelsWebService = $searchHotelsWebService;
-    }
+        protected RoomRepository $roomRepository,
+        protected SearchHotelsWebService $searchHotelsWebService,
+        protected HotelService $hotelService,
+        protected AddressService $addressService,
+    ){}
     public function searchRoomsByHotel(RoomRequest $request){
-        $hotel = Hotel::where('name','=', $request->hotel)->first();
-        $this->validateHotel($hotel);
-        
+
+        $hotel = $this->hotelService->getHotel($request->hotel);
         $rooms = $this->roomRepository->getRoomsByHotel($request->hotel);
 
         $checkIn = date("Y-m-d");
@@ -39,37 +34,34 @@ class RoomService{
             $this->validateWebService($response);
             $responseData = $response->object()->data;
             $amenitiesScreenData = $responseData->amenitiesScreen;
-            $addressData = $responseData->location->address;
-            $address = new Address();
-            $address->name = $addressData;
-            $address->hotel_id = $hotel->id;
-            $address->save();
-            foreach($amenitiesScreenData as $value){
-                if($value->title === 'Room types'){
-                    foreach($value->content as $valueRoom){
-                        $room = new RoomType();
-                        $room->name = $valueRoom;
-                        $room->rooms_available = rand(1,10);
-                        $room->hotel_id = $hotel->id;
-                        $room->save();
-                        array_push($rooms, $room->name);
+
+                DB::beginTransaction();
+            try{
+                $addressData = $responseData->location->address;
+                $address = $this->addressService->buildAddress($addressData, $hotel->id);
+                $this->addressService->createAddress($address);
+    
+                foreach($amenitiesScreenData as $value){
+                    if($value->title === 'Room types'){
+                        foreach($value->content as $valueRoom){
+                            $room = $this->buildRoom($valueRoom, $hotel->id);
+                            $this->roomRepository->createRoom($room);
+                            array_push($rooms, $room->name);
+                        }
                     }
                 }
+                DB::commit();
+            }catch(Exception $e){
+                DB::rollBack();
+                throw $e;
             }
+
         }
         $response = $this->buildResponse($rooms, $hotel->name);
-        return ResponseHelper::Response(true, 'select a room type', $response);
+        return ResponseHelper::Response(true, 'select a room type', Response::HTTP_OK, $response);
     }
 
-    public function validateHotel($hotel){
-        if (empty($hotel)) {
-            throw new HttpResponseException(
-                response()->json([
-                    'success' => false,
-                    'message' => "the hotel was not found"], Response::HTTP_NOT_ACCEPTABLE)
-            );
-        }
-    }
+    
 
     public function validateWebService($response)
     {
@@ -97,5 +89,17 @@ class RoomService{
         }
         $response = ["hotel" => $hotelName, "room_types" => $rooms];
         return $response;
+    }
+
+    public function buildRoom(string $name, int $hotelId){
+        $room = new RoomType();
+        $room->name = $name;
+        $room->rooms_available = rand(1,10);
+        $room->hotel_id = $hotelId;
+        return $room;
+    }
+
+    public function getRoomsAvailable(string $hotel, string $room){
+       return $this->roomRepository->getRoomsAvailable($hotel, $room);
     }
 }
