@@ -4,6 +4,7 @@ namespace App\Http\Services;
 
 use App\Helpers\ResponseHelper;
 use App\Helpers\StringHelper;
+use App\Helpers\ValidateHelper;
 use App\Http\Requests\HotelRequest;
 use App\Http\WebServices\GeoIdWebService;
 use App\Http\WebServices\SearchHotelsWebService;
@@ -38,7 +39,7 @@ class HotelService{
         $geoId = $this->locationService->getGeoId($hotelRequest->location, $hotelRequest->country);
         if (empty($geoId)) {
             $responseGeoId = $this->geoIdWebService->getGeoId($hotelRequest->location, $hotelRequest->country);
-            $this->validateWebService($responseGeoId);
+            ValidateHelper::validateWebService($responseGeoId, "no GeoId found for the location");
 
             $country = $this->countryService->getCountry($countryNormalized);
             if (empty($country)) {
@@ -62,7 +63,7 @@ class HotelService{
         $checkOut = date("Y-m-d", strtotime($checkIn . " +50 days"));
 
         $responseHotels = $this->searchHotelsWebService->getHotels($geoId, $checkIn, $checkOut);
-        $this->validateWebService($responseHotels);
+        ValidateHelper::validateWebService($responseHotels, "no hotels found for the location");
 
         $hotelsArray = $responseHotels->object()->data->data;
         $hotels = [];
@@ -89,24 +90,7 @@ class HotelService{
         $hotelsArray = ['hotels' => $hotels];
         return ResponseHelper::Response(true, 'select a hotel', Response::HTTP_OK, $hotelsArray);
     }
-    public function validateWebService($response)
-    {
-        if ($response->failed()) {
-            throw new HttpResponseException(
-                response()->json([
-                    'success' => false,
-                    'message' => 'Internal Server Error'], Response::HTTP_SERVICE_UNAVAILABLE)
-            );
-        }
-        
-        if (empty($response->object()->data)) {
-            throw new HttpResponseException(
-                response()->json([
-                    'success' => false,
-                    'message' => "no hotels found for the location"], Response::HTTP_NOT_ACCEPTABLE)
-            );
-        }
-    }
+    
     public function buildHotel(string $name, ?int $rating, int $numberHotel, int $locationId){
         $hotel = new Hotel();
         $hotel->name = $name;

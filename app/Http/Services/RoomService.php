@@ -3,6 +3,7 @@
 namespace App\Http\Services;
 
 use App\Helpers\ResponseHelper;
+use App\Helpers\ValidateHelper;
 use App\Http\Requests\RoomRequest;
 use App\Http\WebServices\SearchHotelsWebService;
 use App\Models\RoomType;
@@ -30,8 +31,8 @@ class RoomService{
 
         if($rooms->isEmpty()){
             $response = $this->searchHotelsWebService->getRooms($hotel->number_hotel, $checkIn, $checkOut);
+            ValidateHelper::validateWebService($response, "no rooms were found");
             $rooms = [];
-            $this->validateWebService($response);
             $responseData = $response->object()->data;
             $amenitiesScreenData = $responseData->amenitiesScreen;
 
@@ -59,27 +60,6 @@ class RoomService{
         }
         $response = $this->buildResponse($rooms, $hotel->name);
         return ResponseHelper::Response(true, 'select a room type', Response::HTTP_OK, $response);
-    }
-
-    
-
-    public function validateWebService($response)
-    {
-        if ($response->failed()) {
-            throw new HttpResponseException(
-                response()->json([
-                    'success' => false,
-                    'message' => 'Internal Server Error'], Response::HTTP_SERVICE_UNAVAILABLE)
-            );
-        }
-        
-        if (empty($response->object()->data)) {
-            throw new HttpResponseException(
-                response()->json([
-                    'success' => false,
-                    'message' => "no rooms were found"], Response::HTTP_NOT_ACCEPTABLE)
-            );
-        }
     }
 
     public function buildResponse($rooms, $hotelName){
