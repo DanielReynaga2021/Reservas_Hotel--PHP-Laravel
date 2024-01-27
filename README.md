@@ -7,59 +7,295 @@
 <a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
 </p>
 
-## About Laravel
+# Hotel Reservas
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+Repositorio destinado a la reserva de una habitacion en el hotel elegido.
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+## Instalacion
+Una vez clonado el repositorio, nos paramos dentro proyecto y ejecutamos los siguientes comandos en la consola
+~~~~~~~~~~~~~~~~~~~
+composer install
+~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~
+composer update
+~~~~~~~~~~~~~~~~~~~
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+Ejecutamos las migraciones y los seeders
+~~~~~~~~~~~~~~~~~~~
+php artisan migrate --seed
+~~~~~~~~~~~~~~~~~~~
 
-## Learning Laravel
+Luego levantamos el proyecto ejecutando en consola
+~~~~~~~~~~~~~~~~~~~
+php artisan:make serve
+~~~~~~~~~~~~~~~~~~~
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+## Endpoints
 
-You may also try the [Laravel Bootcamp](https://bootcamp.laravel.com), where you will be guided through building a modern Laravel application from scratch.
+- Nombre: register
+- Descripcion: servicio utilizado para poder registrarnos.
+- Metodo HTTP: POST
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains over 2000 video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+URL: 
+~~~~~~~~~~~~~~~~~~~
+http://localhost:8000/api/register
+~~~~~~~~~~~~~~~~~~~
+Request:
+~~~~~~~~~~~~~~~~~~~
+{
+    "name": "daniel",
+    "email": "danie2@gmail.com",
+    "password": "12345678"
+}
+~~~~~~~~~~~~~~~~~~~
 
-## Laravel Sponsors
+Response:
+~~~~~~~~~~~~~~~~~~~
+{
+    "success": true,
+    "message": "successfully registered"
+}
+~~~~~~~~~~~~~~~~~~~
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the Laravel [Patreon page](https://patreon.com/taylorotwell).
+CURL:
+~~~~~~~~~~~~~~~~~~~
+curl --location --request POST 'http://localhost:8000/api/register' \
+--header 'Accept: application/json' \
+--header 'Content-Type: application/json' \
+--data-raw '{
+    "name": "daniel",
+    "email": "daniel@gmail.com",
+    "password": "12345678"
+}'
+~~~~~~~~~~~~~~~~~~~
+Advertencia: El email no se puede repetir. 
 
-### Premium Partners
+---
+- Nombre: login
+- Descripcion: servicio utilizado para poder autenticarse en el sistema, este genera un token para poder usar algunos endpoinst.
+- Metodo HTTP: POST
 
-- **[Vehikl](https://vehikl.com/)**
-- **[Tighten Co.](https://tighten.co)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Cubet Techno Labs](https://cubettech.com)**
-- **[Cyber-Duck](https://cyber-duck.co.uk)**
-- **[Many](https://www.many.co.uk)**
-- **[Webdock, Fast VPS Hosting](https://www.webdock.io/en)**
-- **[DevSquad](https://devsquad.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel/)**
-- **[OP.GG](https://op.gg)**
-- **[WebReinvent](https://webreinvent.com/?utm_source=laravel&utm_medium=github&utm_campaign=patreon-sponsors)**
-- **[Lendio](https://lendio.com)**
+URL: 
+~~~~~~~~~~~~~~~~~~~
+http://localhost:8000/api/login
+~~~~~~~~~~~~~~~~~~~
+Request:
+~~~~~~~~~~~~~~~~~~~
+{
+    "email": "daniel@gmail.com",
+    "password": "12345678"
+}
+~~~~~~~~~~~~~~~~~~~
 
-## Contributing
+Response:
+~~~~~~~~~~~~~~~~~~~
+{
+    "success": true,
+    "message": "started session with success",
+    "token": "8|uFjQXxNrQbP0vjP3EIfv86AmZxYJlFG0RiUUGcvDf4e957af"
+}
+~~~~~~~~~~~~~~~~~~~
+CURL:
+~~~~~~~~~~~~~~~~~~~
+curl --location --request POST 'http://localhost:8000/api/login' \
+--header 'Accept: application/json' \
+--header 'Content-Type: application/json' \
+--data-raw '{
+    "email": "daniel@gmail.com",
+    "password": "12345678"
+}'
+~~~~~~~~~~~~~~~~~~~
+Advertencia: El token generado tiene duracion de 1 hora, luego expirara y no podra seguir usando algunos endpoints.
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+---
+- Nombre: logout
+- Descripcion: servicio utilizado para poder cerrar la sesión en el sistema.
+- Authorization Type Token Bear
+- Metodo HTTP: POST
 
-## Code of Conduct
+URL: 
+~~~~~~~~~~~~~~~~~~~
+http://localhost:8000/api/logout
+~~~~~~~~~~~~~~~~~~~
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+Response:
+~~~~~~~~~~~~~~~~~~~
+{
+    "success": true,
+    "message": "logged out successfully"
+}
+~~~~~~~~~~~~~~~~~~~
+CURL:
+~~~~~~~~~~~~~~~~~~~
+curl --location --request POST 'http://localhost:8000/api/logout' \
+--header 'Accept: application/json' \
+--header 'Authorization: Bearer 7|oewnxWgXM3f3kGgKjmxYwyL6hYyz0z7eaVsGyZcI01ba6078' \
+--data-raw ''
+~~~~~~~~~~~~~~~~~~~
 
-## Security Vulnerabilities
+---
+- Nombre: hotels
+- Descripcion: servicio utilizado para poder consultar hoteles segun el pais y la localizacion.
+- Authorization Type Token Bear
+- Metodo HTTP: POST
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+URL: 
+~~~~~~~~~~~~~~~~~~~
+http://localhost:8000/api/hotels
+~~~~~~~~~~~~~~~~~~~
+
+Request:
+~~~~~~~~~~~~~~~~~~~
+{
+    "country":"argentina",
+    "location": "buenos aires"
+}
+~~~~~~~~~~~~~~~~~~~
+
+Response:
+~~~~~~~~~~~~~~~~~~~
+{
+    "success": true,
+    "message": "select a hotel",
+    "data": {
+        "hotels": [
+            {
+                "name": "Sofitel Buenos Aires Recoleta",
+                "rating": 4
+            },
+            {
+                "name": "Park Tower, a Luxury Collection Hotel, Buenos Aires",
+                "rating": 4
+            },
+            ...   
+            ...
+            ...
+}
+~~~~~~~~~~~~~~~~~~~
+
+CURL:
+~~~~~~~~~~~~~~~~~~~
+curl --location --request POST 'http://localhost:8000/api/hotels' \
+--header 'Accept: application/json' \
+--header 'Authorization: Bearer 8|uFjQXxNrQbP0vjP3EIfv86AmZxYJlFG0RiUUGcvDf4e957af' \
+--header 'Content-Type: application/json' \
+--data-raw '{
+    "country":"argentina",
+    "location": "buenos aires"
+}'
+~~~~~~~~~~~~~~~~~~~
+
+---
+- Nombre: rooms
+- Descripcion: servicio utilizado para poder consultar las habitaciones segun el hotel.
+- Authorization Type Token Bear
+- Metodo HTTP: POST
+
+URL: 
+~~~~~~~~~~~~~~~~~~~
+http://localhost:8000/api/rooms
+~~~~~~~~~~~~~~~~~~~
+
+Request:
+~~~~~~~~~~~~~~~~~~~
+{
+    "hotel": "Park Tower, a Luxury Collection Hotel, Buenos Aires"
+}
+~~~~~~~~~~~~~~~~~~~
+
+Response:
+~~~~~~~~~~~~~~~~~~~
+{
+    "success": true,
+    "message": "select a room type",
+    "data": {
+        "hotel": "Park Tower, a Luxury Collection Hotel, Buenos Aires",
+        "room_types": [
+            "Non-smoking rooms",
+            "Suites",
+            "Family rooms"
+        ]
+    }
+}
+~~~~~~~~~~~~~~~~~~~
+
+CURL:
+~~~~~~~~~~~~~~~~~~~
+curl --location --request POST 'http://localhost:8000/api/rooms' \
+--header 'Accept: application/json' \
+--header 'Authorization: Bearer 9|XllJoCVtrXXKOJLULYZCZRoNqLR8ZULPf3nNpaYl924e95cf' \
+--header 'Content-Type: application/json' \
+--data-raw '{
+    "hotel": "Park Tower, a Luxury Collection Hotel, Buenos Aires"
+}'
+~~~~~~~~~~~~~~~~~~~
+Advertencia: Antes debe buscar con el endpoints **hotels**, y selecionar un hotel.
+
+---
+- Nombre: reservation
+- Descripcion: servicio utilizado para poder hacer una reserva segun el hotel y la habitacion.
+- Authorization Type Token Bear
+- Metodo HTTP: POST
+
+URL: 
+~~~~~~~~~~~~~~~~~~~
+http://localhost:8000/api/reservation
+~~~~~~~~~~~~~~~~~~~
+
+Request:
+~~~~~~~~~~~~~~~~~~~
+{
+    "hotel": "park Tower, a Luxury Collection Hotel, Buenos Aires",
+    "room":"family rooms",
+    "dateFrom":"28-11-2024",
+    "dateUntil": "29-11-2024"
+}
+~~~~~~~~~~~~~~~~~~~
+
+Response:
+~~~~~~~~~~~~~~~~~~~
+{
+    "success": true,
+    "message": "successfully reservation",
+    "data": {
+        "reservationCode": "GVZJ0VH5",
+        "details": {
+            "hotel": "park Tower, a Luxury Collection Hotel, Buenos Aires",
+            "room": "family rooms",
+            "address": "Avenida Leandro N Alem 1193, Buenos Aires C1001AAG Argentina",
+            "dateFrom": "28-11-2024",
+            "dateUntil": "29-11-2024",
+            "paymentStatus": "PENDING"
+        }
+    }
+}
+~~~~~~~~~~~~~~~~~~~
+
+CURL:
+~~~~~~~~~~~~~~~~~~~
+curl --location --request POST 'http://localhost:8000/api/reservation' \
+--header 'Accept: application/json' \
+--header 'Authorization: Bearer 9|XllJoCVtrXXKOJLULYZCZRoNqLR8ZULPf3nNpaYl924e95cf' \
+--header 'Content-Type: application/json' \
+--data-raw '{
+    "hotel": "park Tower, a Luxury Collection Hotel, Buenos Aires",
+    "room":"family rooms",
+    "dateFrom":"28-11-2024",
+    "dateUntil": "29-11-2024"
+}'
+~~~~~~~~~~~~~~~~~~~
+Advertencia: Antes debe utilizar el endpoints **hotels** y **rooms** 
+
+## Base de datos
+- DER
+
+<a href="https://ibb.co/LSzgZCG"><img src="https://i.ibb.co/Y27dLtr/Captura-de-pantalla-de-2024-01-26-21-32-55.png" alt="Captura-de-pantalla-de-2024-01-26-21-32-55" border="0"></a>
+
+Es una base de datos MySQL, para trabajar localmente debe configurar el archivo .env y ejecutar el siguiente comando para generar la base de datos
+
+~~~~~~~~~~~~~~~~~~~
+php artisan migrate --seed
+~~~~~~~~~~~~~~~~~~~
 
 ## License
 
