@@ -15,7 +15,6 @@ use Illuminate\Database\Eloquent\Model;
  * 
  * @property int $id
  * @property string $name
- * @property string|null $address
  * @property float|null $rating
  * @property int $number_hotel
  * @property int $location_id
@@ -23,6 +22,7 @@ use Illuminate\Database\Eloquent\Model;
  * @property Carbon|null $updated_at
  * 
  * @property Location $location
+ * @property Address $address
  * @property Collection|RoomType[] $room_types
  *
  * @package App\Models
@@ -39,11 +39,14 @@ class Hotel extends Model
 
 	protected $fillable = [
 		'name',
-		'address',
 		'rating',
 		'number_hotel',
-		'location_id'
+		'location_id',
+		'created_at',
+		'updated_at',
 	];
+
+	//protected $guarded = [];
 
 	public function location()
 	{

@@ -66,7 +66,8 @@ class HotelService{
         ValidateHelper::validateWebService($responseHotels, "no hotels found for the location");
 
         $hotelsArray = $responseHotels->object()->data->data;
-        $hotels = [];
+        $hotelsInsert = [];
+        $hotelsResponse = [];
         $locationId = $this->locationService->getLocationId($locationNormalized, $countryNormalized);
 
             DB::beginTransaction();
@@ -74,30 +75,30 @@ class HotelService{
             foreach($hotelsArray as $value){
                     $hotelNormalized = StringHelper::normalizeHotel($value->title); 
                     $hotel = $this->buildHotel($hotelNormalized, $value->bubbleRating->rating, $value->id, $locationId);
-                    $this->hotelRepository->createHotel($hotel);
-                    unset($hotel["updated_at"]);
-                    unset($hotel["created_at"]);
-                    unset($hotel["location_id"]);
-                    unset($hotel["id"]); 
-                    unset($hotel["number_hotel"]);
-                    array_push($hotels, $hotel);
-            }
+                    array_push($hotelsInsert, $hotel);
+                    unset($hotel['number_hotel']);
+                    unset($hotel['location_id']);
+                    unset($hotel['created_at']);
+                    unset($hotel['updated_at']);
+                    array_push($hotelsResponse, $hotel);
+                }
+            Hotel::insert($hotels);
             DB::commit();
         }catch(Exception $e){
             DB::rollBack();
             throw $e;
         }
-        $hotelsArray = ['hotels' => $hotels];
+        $hotelsArray = ['hotels' => $hotelsResponse];
         return ResponseHelper::Response(true, 'select a hotel', Response::HTTP_OK, $hotelsArray);
     }
     
     public function buildHotel(string $name, ?int $rating, int $numberHotel, int $locationId){
-        $hotel = new Hotel();
-        $hotel->name = $name;
-        $hotel->rating = $rating ?? 0;
-        $hotel->number_hotel = $numberHotel;
-        $hotel->location_id = $locationId;
-        return $hotel;
+        return ['name' => $name, 
+                'rating' => $rating ?? 0,
+                'number_hotel' => $numberHotel,
+                'location_id' => $locationId,
+                'created_at' => now(),
+                'updated_at' => now()];
     }
 
     public function getHotelAndRoom(string $hotel, string $room){
